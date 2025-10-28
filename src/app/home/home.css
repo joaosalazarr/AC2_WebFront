@@ -1,0 +1,19 @@
+.botao-desativado {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.is-invalid {
+  border: 1px solid #dc3545;
+}
+
+.text-danger {
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.botao-desativado {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
