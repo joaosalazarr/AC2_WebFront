@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
@@ -6,48 +7,48 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home {
-  email: string = '';
-  destino: string = '';
-  numeroPassageiros: number = 0;
-  dataIda: string = '';
-  dataVolta: string = '';
-  
+export class Home implements OnInit {
+
+  formReserva!: FormGroup
+
+  constructor(private fb: FormBuilder) {}
+
   ngOnInit(): void {
-    const savedEmail = localStorage.getItem('email');
-    const savedDestino = localStorage.getItem('destino');
-    const savedNumeroPassageiros = localStorage.getItem('numeroPassageiros');
-    const savedDataIda = localStorage.getItem('dataIda');
-    const savedDataVolta = localStorage.getItem('dataVolta');
+    this.formReserva = this.fb.group({
+      dataIda: [localStorage.getItem('dataIda') || '', Validators.required],
+      dataVolta: [localStorage.getItem('dataVolta') || '', Validators.required],
+      destino: [localStorage.getItem('destino') || '', Validators.required],
+      numeroPassageiros: [
+        localStorage.getItem('numeroPassageiros') || '',
+        [Validators.required, Validators.min(1), Validators.max(5)]
+      ],
+      email: [
+        localStorage.getItem('email') || '',
+        [Validators.required, Validators.email]
+      ]
+    });
 
-    if (savedDestino) this.destino = savedDestino;
-    if (savedEmail) this.email = savedEmail;
-    if (savedNumeroPassageiros) this.numeroPassageiros = Number(savedNumeroPassageiros);
-    if (savedDataIda) this.dataIda = savedDataIda;
-    if (savedDataVolta) this.dataVolta = savedDataVolta;
+    this.formReserva.valueChanges.subscribe(values => {
+      for (const key in values) {
+        if (values.hasOwnProperty(key)) {
+          localStorage.setItem(key, values[key]);
+        }
+      }
+    });
   }
 
-  updateLocalStorage(key: string, value: number): void {
-    localStorage.setItem(key, value.toString());
-  }
-
-  isDataValid(): boolean {
-    if(!this.dataIda || !this.dataVolta) return false;
-    const dataIda = new Date(this.dataIda);
-    const dataVolta = new Date(this.dataVolta);
-    return dataVolta > dataIda;
+  isDataInvalida(): boolean {
+    const ida = this.formReserva.get('dataIda')?.value;
+    const volta = this.formReserva.get('dataVolta')?.value;
+    if (!ida || !volta) return false;
+    return new Date(volta) < new Date(ida);
   }
 
   isFormValid(): boolean {
-    return this.email !== '' && this.destino !== '' && this.numeroPassageiros > 0 && this.numeroPassageiros <= 5
-    && this.dataIda !== '';
+    return this.formReserva.valid && !this.isDataInvalida();
   }
 
   logInformation(): void {
-    console.log('Email:', this.email);
-    console.log('Destino:', this.destino);
-    console.log('Número de Passageiros:', this.numeroPassageiros);
-    console.log('Data de Ida:', this.dataIda);
-    console.log('Data de Volta:', this.dataVolta);
+    console.log('Formulário:', this.formReserva.value);
   }
 }

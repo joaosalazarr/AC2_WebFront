@@ -1,106 +1,92 @@
 <div class="col-md-8 order-md-1">
-    <h4 class="mb-3">Sistema de reserva de viagens com Angular</h4>
+  <h4 class="mb-3">Sistema de reserva de viagens com Angular</h4>
+
+  <form [formGroup]="formReserva">
+    <div class="mb-3">
+      <label for="dataIda">Data de Ida</label>
+      <input
+        type="date"
+        class="form-control"
+        formControlName="dataIda"
+        [ngClass]="{'is-invalid': formReserva.get('dataIda')?.invalid}"
+      >
+      <div *ngIf="formReserva.get('dataIda')?.invalid" class="text-danger">
+        Selecione uma data válida
+      </div>
+    </div>
 
     <div class="mb-3">
-        <label for="dataIda">Data de Ida</label>
-        <input
-            type="date"
-            class="form-control"
-            name="dataIda"
-            [(ngModel)]="dataIda"
-            (ngModelChange)="updateLocalStorage('dataIda', $event)"
-            required
-            #dataIdaRef="ngModel"
-            [ngClass]="{'is-invalid': dataIdaRef.invalid && isDataValid()}"
-        >
-        <div *ngIf="dataIdaRef.invalid && isDataValid()" class="text-danger">
-            Selecione uma data válida
-        </div>
+      <label for="dataVolta">Data de Volta</label>
+      <input
+        type="date"
+        class="form-control"
+        formControlName="dataVolta"
+        [ngClass]="{
+          'is-invalid': (formReserva.get('dataVolta')?.invalid) || isDataInvalida()
+        }"
+      >
+      <div *ngIf="formReserva.get('dataVolta')?.invalid" class="text-danger">
+        Selecione uma data válida
+      </div>
+      <div *ngIf="isDataInvalida()" class="text-danger">
+        A data de volta não pode ser antes da data de ida
+      </div>
     </div>
 
-        <div class="mb-3">
-        <label for="dataVolta">Data de Volta</label>
-        <input
-            type="date"
-            class="form-control"
-            name="dataVolta"
-            [(ngModel)]="dataVolta"
-            (ngModelChange)="updateLocalStorage('dataVolta', $event)"
-            required
-            #dataVoltaRef="ngModel"
-            [ngClass]="{'is-invalid': dataVoltaRef.invalid && isDataValid()}"
-        >
-        <div *ngIf="dataVoltaRef.invalid && isDataValid()" class="text-danger">
-            Selecione uma data válida
-        </div>
-    </div>
-
-
-    <div class="row">
-        <div class="col-md-12 mb-3">
-            <label for="country">Destino</label>
-            <select 
-            class="custom-select d-block w-100" 
-            [(ngModel)]="destino"
-            (ngModelChange)="updateLocalStorage('destino', $event)" 
-            required
-            min="1"
-            #destinoRef="ngModel"
-            [ngClass]="{'is-invalid': destinoRef.invalid}">
-                <option value=''>Escolha...</option>
-                <option value="Paris">Paris</option>
-                <option value="Nova Iorque">Nova Iorque</option>
-                <option value="Tóquio">Tóquio</option>
-                <option value="Rio de Janeiro">Rio de Janeiro</option>
-            </select>
-            <div *ngIf="destinoRef.invalid" class="text-danger">
-                Campo obrigatório
-            </div>
-        </div>
-        
+    <div class="mb-3">
+      <label for="destino">Destino</label>
+      <select
+        class="custom-select d-block w-100"
+        formControlName="destino"
+        [ngClass]="{'is-invalid': formReserva.get('destino')?.invalid}"
+      >
+        <option value="">Escolha...</option>
+        <option value="Paris">Paris</option>
+        <option value="Nova Iorque">Nova Iorque</option>
+        <option value="Tóquio">Tóquio</option>
+        <option value="Rio de Janeiro">Rio de Janeiro</option>
+      </select>
+      <div *ngIf="formReserva.get('destino')?.invalid" class="text-danger">
+        Campo obrigatório
+      </div>
     </div>
 
     <div class="col-md-3 mb-3">
-        <label for="cc-expiration">Número de passageiros</label>
-        <input 
-        type="number" 
-        class="form-control" 
-        [(ngModel)]="numeroPassageiros"
-        (ngModelChange)="updateLocalStorage('numeroPassageiros', $event)"
+      <label for="numeroPassageiros">Número de passageiros</label>
+      <input
+        type="number"
+        class="form-control"
+        formControlName="numeroPassageiros"
         placeholder="1"
-        #numeroPassageirosRef="ngModel"
-        [ngClass]="{'is-invalid': numeroPassageirosRef.invalid}"
-        required
-        min="1"
-        >
-        <div *ngIf="numeroPassageirosRef.invalid || numeroPassageiros <= 0 || numeroPassageiros > 5" class="text-danger">
-            O número de passageiros deve estar entre 1 e 5
-        </div>
+        [ngClass]="{'is-invalid': formReserva.get('numeroPassageiros')?.invalid}"
+      >
+      <div *ngIf="formReserva.get('numeroPassageiros')?.invalid" class="text-danger">
+        O número de passageiros deve estar entre 1 e 5
+      </div>
     </div>
 
     <div class="mb-3">
-        <label for="email">Email de contato</label>
-        <input 
-        type="email" 
-        class="form-control" 
-        [(ngModel)]="email" 
-        (ngModelChange)="updateLocalStorage('email', $event)"
-        [ngClass]="{'is-invalid': emailRef.invalid}"
+      <label for="email">Email de contato</label>
+      <input
+        type="email"
+        class="form-control"
+        formControlName="email"
         placeholder="you@example.com"
-        #emailRef="ngModel"
-        required
-        email>
-
-        <div *ngIf="emailRef.invalid" class="text-danger">
-            Insira um e-mail válido
-        </div>
+        [ngClass]="{'is-invalid': formReserva.get('email')?.invalid}"
+      >
+      <div *ngIf="formReserva.get('email')?.invalid" class="text-danger">
+        Insira um e-mail válido
+      </div>
     </div>
-    
-    <button 
-        class="btn btn-primary btn-lg btn-block" 
-        type="submit"
-        [ngClass]="{'botao-desativado': !isFormValid()}"
-        (click)="logInformation()">Continue to checkout
-    </button>
 
+    <button
+      class="btn btn-primary btn-lg btn-block"
+      type="button"
+      [ngClass]="{'botao-desativado': !isFormValid()}"
+      [disabled]="!isFormValid()"
+      (click)="logInformation()"
+    >
+      Continue to checkout
+    </button>
+  </form>
 </div>
